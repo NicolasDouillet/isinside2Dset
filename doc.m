@@ -1,25 +1,25 @@
-% isinside2Dset
+%% isinside2Dset
 %
 % Function to check if a vertex is located inside or outside a given
 % 2D set, boundary not included (opened set).
 %
 % Author & support : nicolas.douillet (at) free.fr, 2022.
 %
-% Syntax
+%% Syntax
 %
 % isin = isinside2Dset(V, P);
 %
-% Description
+%% Description
 %
 % isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
 % in the case the vertex P belongs to the opened convex set V. isin is false/logical
 % 0 in the case vertex P belongs to the complementary set or the boundary.
 %
-% See also 
+%% See also 
 %
 % <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset>
 %
-% Input arguments
+%% Input arguments
 %
 %        [ |  |  |]
 % - V = [Vx Vy Vz], real matrix double, the convex set, with size(V,1) > size(V,2) to define a relevant convex set.
@@ -30,14 +30,14 @@
 %        [ |  |  |]
 %
 %
-% Output argument
+%% Output argument
 %
 %           [      |      ]
 % - isin = [logical 1 / 0], logical true (1)/false (0) scalar / column vector. The boolean result. Size(isin) = [size(P,1),1].
 %           [      |      ]
 %
 %
-% Example #1 : 2D convex hull of random point cloud
+%% Example #1 : 2D convex hull of random point cloud
 N = 16;
 V = 2*(rand(N,2)-0.5);
 G = mean(V,1);
@@ -45,7 +45,7 @@ V = V - G;
 theta = atan2(V(:,2),V(:,1));
 [~,i] = sort(theta);
 V = V(i,:);
-[A B] = meshgrid(-1:0.1:1);
+[A,B] = meshgrid(-1:0.1:1);
 P = cat(2,A(:),B(:));
 
 figure
