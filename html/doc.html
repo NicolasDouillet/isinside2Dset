@@ -1,0 +1,192 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>doc</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2023-01-08"><meta name="DC.source" content="doc.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% isinside2Dset</span>
+<span class="comment">%</span>
+<span class="comment">% Function to check if a vertex is located inside or outside a given</span>
+<span class="comment">% 2D set, boundary not included (opened set).</span>
+<span class="comment">%</span>
+<span class="comment">% Author &amp; support : nicolas.douillet (at) free.fr, 2022.</span>
+<span class="comment">%</span>
+<span class="comment">% Syntax</span>
+<span class="comment">%</span>
+<span class="comment">% isin = isinside2Dset(V, P);</span>
+<span class="comment">%</span>
+<span class="comment">% Description</span>
+<span class="comment">%</span>
+<span class="comment">% isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1</span>
+<span class="comment">% in the case the vertex P belongs to the opened convex set V. isin is false/logical</span>
+<span class="comment">% 0 in the case vertex P belongs to the complementary set or the boundary.</span>
+<span class="comment">%</span>
+<span class="comment">% See also</span>
+<span class="comment">%</span>
+<span class="comment">% &lt;https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset&gt;</span>
+<span class="comment">%</span>
+<span class="comment">% Input arguments</span>
+<span class="comment">%</span>
+<span class="comment">%        [ |  |  |]</span>
+<span class="comment">% - V = [Vx Vy Vz], real matrix double, the convex set, with size(V,1) &gt; size(V,2) to define a relevant convex set.</span>
+<span class="comment">%        [ |  |  |]</span>
+<span class="comment">%</span>
+<span class="comment">%        [ |  |  |]</span>
+<span class="comment">% - P = [Px Py Pz], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).</span>
+<span class="comment">%        [ |  |  |]</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% Output argument</span>
+<span class="comment">%</span>
+<span class="comment">%           [      |      ]</span>
+<span class="comment">% - isin = [logical 1 / 0], logical true (1)/false (0) scalar / column vector. The boolean result. Size(isin) = [size(P,1),1].</span>
+<span class="comment">%           [      |      ]</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% Example #1 : 2D convex hull of random point cloud</span>
+N = 16;
+V = 2*(rand(N,2)-0.5);
+G = mean(V,1);
+V = V - G;
+theta = atan2(V(:,2),V(:,1));
+[~,i] = sort(theta);
+V = V(i,:);
+[A B] = meshgrid(-1:0.1:1);
+P = cat(2,A(:),B(:));
+
+figure
+line([V(:,1); V(1,1)],[V(:,2); V(1,2)],<span class="string">'Color'</span>,[0 0 1],<span class="string">'LineWidth'</span>,2), hold <span class="string">on</span>;
+set(gcf,<span class="string">'Color'</span>,[0 0 0]), set(gca,<span class="string">'Color'</span>,[0 0 0],<span class="string">'XColor'</span>,[1 1 1],<span class="string">'YColor'</span>,[1 1 1],<span class="string">'FontSize'</span>,16);
+xlabel(<span class="string">'X'</span>), ylabel(<span class="string">'Y'</span>);
+
+isin = cell2mat(cellfun(@(c) isinside2Dset(V,c),num2cell(P,2),<span class="string">'un'</span>,0));
+ColorSpec = cell2mat(cellfun(@(c) cat(2,~c,c,0),num2cell(isin,2),<span class="string">'un'</span>,0));
+
+cellfun(@(r1,r2) plot(r1(1,1),r1(1,2),<span class="string">'+'</span>,<span class="string">'Color'</span>,r2,<span class="string">'MarkerSize'</span>,4,<span class="string">'LineWidth'</span>,4),num2cell(P,2),num2cell(ColorSpec,2),<span class="string">'un'</span>,0);
+axis <span class="string">equal</span>, axis <span class="string">tight</span>;
+</pre><img vspace="5" hspace="5" src="doc_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% isinside2Dset
+%
+% Function to check if a vertex is located inside or outside a given
+% 2D set, boundary not included (opened set).
+%
+% Author & support : nicolas.douillet (at) free.fr, 2022.
+%
+% Syntax
+%
+% isin = isinside2Dset(V, P);
+%
+% Description
+%
+% isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
+% in the case the vertex P belongs to the opened convex set V. isin is false/logical
+% 0 in the case vertex P belongs to the complementary set or the boundary.
+%
+% See also 
+%
+% <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset>
+%
+% Input arguments
+%
+%        [ |  |  |]
+% - V = [Vx Vy Vz], real matrix double, the convex set, with size(V,1) > size(V,2) to define a relevant convex set.
+%        [ |  |  |]
+%
+%        [ |  |  |]
+% - P = [Px Py Pz], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
+%        [ |  |  |]
+%
+%
+% Output argument
+%
+%           [      |      ]
+% - isin = [logical 1 / 0], logical true (1)/false (0) scalar / column vector. The boolean result. Size(isin) = [size(P,1),1].
+%           [      |      ]
+%
+%
+% Example #1 : 2D convex hull of random point cloud
+N = 16;
+V = 2*(rand(N,2)-0.5);
+G = mean(V,1);
+V = V - G;
+theta = atan2(V(:,2),V(:,1));
+[~,i] = sort(theta);
+V = V(i,:);
+[A B] = meshgrid(-1:0.1:1);
+P = cat(2,A(:),B(:));
+
+figure
+line([V(:,1); V(1,1)],[V(:,2); V(1,2)],'Color',[0 0 1],'LineWidth',2), hold on;
+set(gcf,'Color',[0 0 0]), set(gca,'Color',[0 0 0],'XColor',[1 1 1],'YColor',[1 1 1],'FontSize',16);
+xlabel('X'), ylabel('Y');
+
+isin = cell2mat(cellfun(@(c) isinside2Dset(V,c),num2cell(P,2),'un',0));
+ColorSpec = cell2mat(cellfun(@(c) cat(2,~c,c,0),num2cell(isin,2),'un',0));
+
+cellfun(@(r1,r2) plot(r1(1,1),r1(1,2),'+','Color',r2,'MarkerSize',4,'LineWidth',4),num2cell(P,2),num2cell(ColorSpec,2),'un',0);
+axis equal, axis tight;
+##### SOURCE END #####
+--></body></html>
