@@ -3,7 +3,7 @@
 % Function to check if a vertex is located inside or outside a given
 % 2D set, boundary not included (opened set).
 %
-% Author & support : nicolas.douillet (at) free.fr, 2022.
+% Author & support : nicolas.douillet (at) free.fr, 2023.
 %
 %% Syntax
 %
@@ -21,14 +21,13 @@
 %
 %% Input arguments
 %
-%        [ |  |  |]
-% - V = [Vx Vy Vz], real matrix double, the convex set, with size(V,1) > size(V,2) to define a relevant convex set.
-%        [ |  |  |]
+%        [ |  |  ]
+% - V = [ Vx Vy ], real matrix double, the convex set, with size(V,2) = 2.
+%        [ |  |  ]
 %
-%        [ |  |  |]
-% - P = [Px Py Pz], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
-%        [ |  |  |]
-%
+%        [ |  | ]
+% - P = [Px Py ], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
+%        [ |  | ]
 %
 %% Output argument
 %

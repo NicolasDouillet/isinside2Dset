@@ -1,8 +1,8 @@
 function isin = isinside2Dset(V, P)
-% isinside2Dset : function to check if a vertex is located inside or outside a given
+%% isinside2Dset : function to check if a vertex is located inside or outside a given
 % 2D set, boundary not included (opened set).
 %
-% Author & support : nicolas.douillet (at) free.fr, 2022.
+% Author & support : nicolas.douillet (at) free.fr, 2023.
 %
 %
 % Syntax
@@ -17,18 +17,15 @@ function isin = isinside2Dset(V, P)
 % 0 in the case vertex P belongs to the complementary set or the boundary.
 %
 %
-% See also : CONVHULL
-%
-%
 % Input arguments
 %
-%       [ |  |  |]
-% - V = [Vx Vy Vz], real matrix double, the convex set, with size(V,1) > size(V,2) to define a relevant convex set.
-%       [ |  |  |]
+%       [ |  |  ]
+% - V = [ Vx Vy ], real matrix double, the convex set, with size(V,2) = 2.
+%       [ |  |  ]
 %
-%       [ |  |  |]
-% - P = [Px Py Pz], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
-%       [ |  |  |]
+%       [ |  | ]
+% - P = [Px Py ], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
+%       [ |  | ]
 %
 %
 % Output argument
@@ -61,11 +58,12 @@ function isin = isinside2Dset(V, P)
 % axis equal, axis tight;
 
 
-% Input parsing
+%% Input parsing
 assert(nargin > 1,'Not enought input arguments.');
 assert(nargin < 3,'Too many input arguments.');
+assert(isequal(size(V,2),size(P,2),2),'All the inputs must have the same number of colums (two dimensions here).');
 
-% Body
+%% Body
 nb_test_vtx = size(P,1);
 G = mean(V,1);
 nb_vtx = size(V,1);
@@ -152,9 +150,10 @@ end
 end % isinside2Dset
 
 
+%% point_to_line_distance subfunction
 function [d2H, H] = point_to_line_distance(P, u, I0)
 %
-% Author & support : nicolas.douillet (at) free.fr, 2019-2022.
+% Author & support : nicolas.douillet (at) free.fr, 2019-2023.
 
 
 dimension = size(P,2);  
