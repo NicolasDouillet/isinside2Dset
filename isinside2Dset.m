@@ -1,6 +1,6 @@
 function isin = isinside2Dset(V, P)
-%% isinside2Dset : function to check if a vertex is located inside or outside a given
-% 2D set, boundary not included (opened set).
+% isinside2Dset : function to check if a vertex is located inside or outside a given
+% 2D set, boundary included (closed set).
 %
 % Author & support : nicolas.douillet (at) free.fr, 2023.
 %
@@ -13,14 +13,14 @@ function isin = isinside2Dset(V, P)
 % Description
 %
 % isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
-% in the case the vertex P belongs to the opened convex set V. isin is false/logical
-% 0 in the case vertex P belongs to the complementary set or the boundary.
+% in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical
+% 0 in the case vertex P belongs to the complementary set.
 %
 %
 % Input arguments
 %
 %       [ |  |  ]
-% - V = [ Vx Vy ], real matrix double, the convex set, with size(V,2) = 2.
+% - V = [ Vx Vy ], real matrix double, the set, with size(V,2) = 2.
 %       [ |  |  ]
 %
 %       [ |  | ]
@@ -31,11 +31,11 @@ function isin = isinside2Dset(V, P)
 % Output argument
 %
 %          [      |      ]
-% - isin = [logical 1 / 0], logical true (1)/false (0) scalar / column vector. The boolean result. Size(isin) = [size(P,1),1].
+% - isin = [logical 1 / 0], logical true (1)/false (0) scalar / vector. The boolean result. numel(isin) = size(P,1)
 %          [      |      ]
 %
 %
-% Example #1 : 2D random point cloud
+% Example #1 : random 2D point cloud
 % N = 16;
 % V = 2*(rand(N,2)-0.5);
 % G = mean(V,1);
@@ -58,18 +58,22 @@ function isin = isinside2Dset(V, P)
 % axis equal, axis tight;
 
 
-%% Input parsing
+% Input parsing
 assert(nargin > 1,'Not enought input arguments.');
 assert(nargin < 3,'Too many input arguments.');
 assert(isequal(size(V,2),size(P,2),2),'All the inputs must have the same number of colums (two dimensions here).');
 
-%% Body
+% Body
+epsilon = 1e4*eps;
 nb_test_vtx = size(P,1);
 G = mean(V,1);
 nb_vtx = size(V,1);
 
 V1 = cat(2,V,zeros(nb_vtx,1));
 V2 = circshift(V1,1,1);
+
+% % Barycentres
+% Gi = 0.5*(V1 + V2);
 
 % Hyperplane normals
 ui = V1 - V2;
@@ -103,7 +107,11 @@ d2Hi = cell2mat(d2Hi);
 Hi = cell2mat(Hi);
 
 % Check if H_i belongs to [Vi; Vi+1 segment]
-dot_prod_sign = sign(dot(V1-Hi,V2-Hi,2));
+dot_prod_sign = dot(V1-Hi,V2-Hi,2) < epsilon;
+
+Hi = Hi(dot_prod_sign,:);
+di = d2Hi(dot_prod_sign,:);
+Ni = ni(dot_prod_sign,:);
 
 dst_mat = sqrt(sum((P(:,1:2)-V).^2,2));
 [min_dst2V,nrst_vtx_idx] = min(dst_mat);
@@ -111,13 +119,8 @@ Mi = mi(nrst_vtx_idx,:);
 Vi = V(nrst_vtx_idx,:);
 
 
-f = find(1-dot_prod_sign);
-
-if ~isempty(f)
-    
-    Hi = Hi(f,:);
-    di = d2Hi(f,:);
-    Ni = ni(f,:);
+if ~isempty(di)
+        
     [min_dst2H,i] = min(di);
     H = Hi(i,:);
     N = Ni(i,:);
@@ -125,22 +128,22 @@ if ~isempty(f)
     if min_dst2H <= min_dst2V
         
         % 'hyperplane'
-        isin = sign(1+sign(dot(H-P,N)));
+        isin = dot(H-P,N) > -epsilon;
         
     else % if min_dst2H > min_dst2V
         
         % 'vertex'
-        isin = sign(1+sign(dot(Vi-P(:,1:2),Mi(:,1:2))));
+        isin = dot(Vi-P(:,1:2),Mi(:,1:2)) > -epsilon;
         
     end
     
-else % if isempty(f) % cas où f vide (le point ne se projette sur aucun segment);
+else % if isempty(di) % void f case (P point doesn't project on any segment);
     
-    isin = 0; % out by default
+    isin = false; % out by default
     
-    if sign(dot(Vi-P(:,1:2),Mi(:,1:2))) > 0 % the closest vertex only
+    if dot(Vi-P(:,1:2),Mi(:,1:2)) > -epsilon % the closest vertex only
         
-        isin = 1;
+        isin = true;
         
     end
     
@@ -150,7 +153,7 @@ end
 end % isinside2Dset
 
 
-%% point_to_line_distance subfunction
+% point_to_line_distance subfunction
 function [d2H, H] = point_to_line_distance(P, u, I0)
 %
 % Author & support : nicolas.douillet (at) free.fr, 2019-2023.

@@ -1,7 +1,7 @@
 %% isinside2Dset
 %
 % Function to check if a vertex is located inside or outside a given
-% 2D set, boundary not included (opened set).
+% 2D set, boundary included (closed set).
 %
 % Author & support : nicolas.douillet (at) free.fr, 2023.
 %
@@ -12,8 +12,8 @@
 %% Description
 %
 % isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
-% in the case the vertex P belongs to the opened convex set V. isin is false/logical
-% 0 in the case vertex P belongs to the complementary set or the boundary.
+% in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical
+% 0 in the case vertex P belongs to the complementary set.
 %
 %% See also 
 %
@@ -22,7 +22,7 @@
 %% Input arguments
 %
 %        [ |  |  ]
-% - V = [ Vx Vy ], real matrix double, the convex set, with size(V,2) = 2.
+% - V = [ Vx Vy ], real matrix double, the set, with size(V,2) = 2.
 %        [ |  |  ]
 %
 %        [ |  | ]
@@ -36,7 +36,7 @@
 %           [      |      ]
 %
 %
-%% Example #1 : 2D convex hull of random point cloud
+%% Example #1 : random 2D point cloud
 N = 16;
 V = 2*(rand(N,2)-0.5);
 G = mean(V,1);
