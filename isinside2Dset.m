@@ -17,6 +17,9 @@ function isin = isinside2Dset(V, P)
 % 0 in the case vertex P belongs to the complementary set.
 %
 %
+% See also : INPOLYGON
+%
+%
 % Input arguments
 %
 %       [ |  |  ]
