@@ -1,5 +1,5 @@
 function isin = isinside2Dset(V, P)
-% isinside2Dset : function to check if a vertex is located inside or outside a given
+%% isinside2Dset : function to check if a vertex is located inside or outside a given
 % 2D set, boundary included (closed set).
 %
 % Author & support : nicolas.douillet (at) free.fr, 2023.
@@ -58,12 +58,12 @@ function isin = isinside2Dset(V, P)
 % axis equal, axis tight;
 
 
-% Input parsing
+%% Input parsing
 assert(nargin > 1,'Not enought input arguments.');
 assert(nargin < 3,'Too many input arguments.');
 assert(isequal(size(V,2),size(P,2),2),'All the inputs must have the same number of colums (two dimensions here).');
 
-% Body
+%% Body
 epsilon = 1e4*eps;
 nb_test_vtx = size(P,1);
 G = mean(V,1);
@@ -76,7 +76,7 @@ V2 = circshift(V1,1,1);
 % Gi = 0.5*(V1 + V2);
 
 % Hyperplane normals
-ui = V1 - V2;
+ui = V1 - V2; % (V,u) lines corresponding to [Vi; Vi+1] segments
 ni = cat(2,-ui(:,2),ui(:,1));
 ni = ni ./ sqrt(sum(ni.^2,2));
 ni = ni(:,1:2);
@@ -92,58 +92,56 @@ ni = cat(2,ni,zeros(size(ni,1),1));
 
 % Vertex normals
 mi = 0.5*(ni+circshift(ni,-1,1)); 
-mi = mi ./ sqrt(sum(mi.^2,2));
-                         
-% (V,u) lines corresponding to [Vi; Vi+1] segments
-ui = V1 - V2; 
+mi = mi ./ sqrt(sum(mi.^2,2));                         
 
 % Hi, projections of P on each segment support line
 P = cat(2,P,zeros(nb_test_vtx,1));
+isin = zeros(nb_test_vtx,1); % out by default
 
-% TODO : use arrayfun instead
-[d2Hi,Hi] = cellfun(@(r1,r2) point_to_line_distance(P,r1,r2),num2cell(ui,2),num2cell(V1,2),'un',0);    
-
-d2Hi = cell2mat(d2Hi);
-Hi = cell2mat(Hi);
-
-% Check if H_i belongs to [Vi; Vi+1 segment]
-dot_prod_sign = dot(V1-Hi,V2-Hi,2) < epsilon;
-
-Hi = Hi(dot_prod_sign,:);
-di = d2Hi(dot_prod_sign,:);
-Ni = ni(dot_prod_sign,:);
-
-dst_mat = sqrt(sum((P(:,1:2)-V).^2,2));
-[min_dst2V,nrst_vtx_idx] = min(dst_mat);
-Mi = mi(nrst_vtx_idx,:);
-Vi = V(nrst_vtx_idx,:);
-
-
-if ~isempty(di)
-        
-    [min_dst2H,i] = min(di);
-    H = Hi(i,:);
-    N = Ni(i,:);
+for k = 1:size(P,1)
     
-    if min_dst2H <= min_dst2V
-        
-        % 'hyperplane'
-        isin = dot(H-P,N) > -epsilon;
-        
-    else % if min_dst2H > min_dst2V
-        
-        % 'vertex'
-        isin = dot(Vi-P(:,1:2),Mi(:,1:2)) > -epsilon;
-        
-    end
+    [d2Hi,Hi] = cellfun(@(r1,r2) point_to_line_distance(P(k,:),r1,r2),num2cell(ui,2),num2cell(V1,2),'un',0);
     
-else % if isempty(di) % void f case (P point doesn't project on any segment);
+    d2Hi = cell2mat(d2Hi);
+    Hi = cell2mat(Hi);
     
-    isin = false; % out by default
+    % Check if H_i belongs to [Vi; Vi+1 segment]
+    dot_prod_sign = dot(V1-Hi,V2-Hi,2) < epsilon;
     
-    if dot(Vi-P(:,1:2),Mi(:,1:2)) > -epsilon % the closest vertex only
+    Hi = Hi(dot_prod_sign,:);
+    di = d2Hi(dot_prod_sign,:);
+    Ni = ni(dot_prod_sign,:);
+    
+    dst_mat = sqrt(sum((P(k,1:2)-V).^2,2));
+    [min_dst2V,nrst_vtx_idx] = min(dst_mat);
+    Mi = mi(nrst_vtx_idx,:);
+    Vi = V(nrst_vtx_idx,:);
         
-        isin = true;
+    if ~isempty(di)
+        
+        [min_dst2H,i] = min(di);
+        H = Hi(i,:);
+        N = Ni(i,:);
+        
+        if min_dst2H <= min_dst2V
+            
+            % 'hyperplane'
+            isin(k) = dot(H-P(k,:),N) > -epsilon;
+            
+        else % if min_dst2H > min_dst2V
+            
+            % 'vertex'
+            isin(k) = dot(Vi-P(k,1:2),Mi(:,1:2)) > -epsilon;
+            
+        end
+        
+    else % if isempty(di) % void f case (P point doesn't project on any segment);                
+        
+        if dot(Vi-P(k,1:2),Mi(:,1:2)) > -epsilon % the closest vertex only
+            
+            isin(k) = true;
+            
+        end
         
     end
     
@@ -153,7 +151,7 @@ end
 end % isinside2Dset
 
 
-% point_to_line_distance subfunction
+%% point_to_line_distance subfunction
 function [d2H, H] = point_to_line_distance(P, u, I0)
 %
 % Author & support : nicolas.douillet (at) free.fr, 2019-2023.
