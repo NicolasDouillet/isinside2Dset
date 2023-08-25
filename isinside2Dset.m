@@ -66,6 +66,7 @@ assert(nargin > 1,'Not enought input arguments.');
 assert(nargin < 3,'Too many input arguments.');
 assert(isequal(size(V,2),size(P,2),2),'All the inputs must have the same number of colums (two dimensions here).');
 
+
 %% Body
 epsilon = 1e4*eps;
 nb_test_vtx = size(P,1);
@@ -74,9 +75,6 @@ nb_vtx = size(V,1);
 
 V1 = cat(2,V,zeros(nb_vtx,1));
 V2 = circshift(V1,1,1);
-
-% % Barycentres
-% Gi = 0.5*(V1 + V2);
 
 % Hyperplane normals
 ui = V1 - V2; % (V,u) lines corresponding to [Vi; Vi+1] segments
@@ -101,6 +99,7 @@ mi = mi ./ sqrt(sum(mi.^2,2));
 P = cat(2,P,zeros(nb_test_vtx,1));
 isin = zeros(nb_test_vtx,1); % out by default
 
+
 for k = 1:size(P,1)
     
     [d2Hi,Hi] = cellfun(@(r1,r2) point_to_line_distance(P(k,:),r1,r2),num2cell(ui,2),num2cell(V1,2),'un',0);
@@ -119,34 +118,23 @@ for k = 1:size(P,1)
     [min_dst2V,nrst_vtx_idx] = min(dst_mat);
     Mi = mi(nrst_vtx_idx,:);
     Vi = V(nrst_vtx_idx,:);
+    
+    
+    [min_dst2H,i] = min(di);
+    H = Hi(i,:);
+    N = Ni(i,:);
+    
+    if ~isempty(i) && min_dst2H <= min_dst2V
         
-    if ~isempty(di)
+        % 'hyperplane'
+        isin(k) = dot(H-P(k,:),N) > -epsilon;
         
-        [min_dst2H,i] = min(di);
-        H = Hi(i,:);
-        N = Ni(i,:);
+    else % if isempty(di) % void f case (P point doesn't project on any segment);
         
-        if min_dst2H <= min_dst2V
-            
-            % 'hyperplane'
-            isin(k) = dot(H-P(k,:),N) > -epsilon;
-            
-        else % if min_dst2H > min_dst2V
-            
-            % 'vertex'
-            isin(k) = dot(Vi-P(k,1:2),Mi(:,1:2)) > -epsilon;
-            
-        end
-        
-    else % if isempty(di) % void f case (P point doesn't project on any segment);                
-        
-        if dot(Vi-P(k,1:2),Mi(:,1:2)) > -epsilon % the closest vertex only
-            
-            isin(k) = true;
-            
-        end
+        isin(k) = dot(Vi-P(k,1:2),Mi(:,1:2)) > -epsilon; % the closest vertex only
         
     end
+    
     
 end
 
