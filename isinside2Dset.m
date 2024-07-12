@@ -2,7 +2,7 @@ function isin = isinside2Dset(V, P)
 %% isinside2Dset : function to check if a vertex is located inside or outside a given
 % 2D set, boundary included (closed set).
 %
-% Author & support : nicolas.douillet (at) free.fr, 2023.
+% Author : nicolas.douillet (at) free.fr, 2023-2024.
 %
 %
 % Syntax
@@ -79,7 +79,7 @@ V2 = circshift(V1,1,1);
 % Hyperplane normals
 ui = V1 - V2; % (V,u) lines corresponding to [Vi; Vi+1] segments
 ni = cat(2,-ui(:,2),ui(:,1));
-ni = ni ./ sqrt(sum(ni.^2,2));
+ni = ni ./ vecnorm(ni',2)';
 ni = ni(:,1:2);
 
 % Coherently orient outward hyperplane normals
@@ -93,7 +93,7 @@ ni = cat(2,ni,zeros(size(ni,1),1));
 
 % Vertex normals
 mi = 0.5*(ni+circshift(ni,-1,1)); 
-mi = mi ./ sqrt(sum(mi.^2,2));                         
+mi = mi ./ vecnorm(mi',2)';                         
 
 % Hi, projections of P on each segment support line
 P = cat(2,P,zeros(nb_test_vtx,1));
@@ -114,7 +114,7 @@ for k = 1:size(P,1)
     di = d2Hi(dot_prod_sign,:);
     Ni = ni(dot_prod_sign,:);
     
-    dst_mat = sqrt(sum((P(k,1:2)-V).^2,2));
+    dst_mat = vecnorm((P(k,1:2)-V)',2);
     [min_dst2V,nrst_vtx_idx] = min(dst_mat);
     Mi = mi(nrst_vtx_idx,:);
     Vi = V(nrst_vtx_idx,:);
@@ -170,7 +170,7 @@ H(:,3) = z_H;
 
 
 % Distance
-d2H = sqrt(sum((P-H).^2,2));
+d2H = vecnorm((P-H)',2)';
 H = H(:,1:dimension);
 
 
