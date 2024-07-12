@@ -3,7 +3,7 @@
 % Function to check if a vertex is located inside or outside a given
 % 2D set, boundary included (closed set).
 %
-% Author & support : nicolas.douillet (at) free.fr, 2023.
+% Author : nicolas.douillet (at) free.fr, 2023-2024.
 %
 %% Syntax
 %
