@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>isinside2Dset</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2023-01-22"><meta name="DC.source" content="doc.m"><style type="text/css">
+      --><title>isinpolygon</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2025-09-26"><meta name="DC.source" content="doc.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>isinside2Dset</h1><!--introduction--><p>Function to check if a vertex is located inside or outside a given 2D set, boundary included (closed set).</p><p>Author &amp; support : nicolas.douillet (at) free.fr, 2023.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">See also</a></li><li><a href="#4">Input arguments</a></li><li><a href="#5">Output argument</a></li><li><a href="#6">Example #1 : random 2D point cloud</a></li></ul></div><h2 id="1">Syntax</h2><p>isin = isinside2Dset(V, P);</p><h2 id="2">Description</h2><p>isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1 in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical 0 in the case vertex P belongs to the complementary set.</p><h2 id="3">See also</h2><p><a href="https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle">isinconvexset</a></p><h2 id="4">Input arguments</h2><pre>      [ |  |  ]
+  </style></head><body><div class="content"><h1>isinpolygon</h1><!--introduction--><p>Function to test if a vertex is located inside or outside a given 2D set, boundary included (closed set).</p><p>Author : nicolas.douillet9 (at) gmail.com, 2023-2025.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Description</a></li><li><a href="#3">See also</a></li><li><a href="#4">Input arguments</a></li><li><a href="#5">Output argument</a></li><li><a href="#6">Example #1 : random 2D point cloud</a></li></ul></div><h2 id="1">Syntax</h2><p>isin = isinpolygon(V, P);</p><h2 id="2">Description</h2><p>isin = isinpolygon(V, P) computes the boolean isin which is true/logical 1 in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical 0 in the case vertex P belongs to the complementary set.</p><h2 id="3">See also</h2><p>| <a href="https://fr.mathworks.com/matlabcentral/fileexchange/182100-ispointin3dtriangle?s_tid=srchtitle">ispointin3dtriangle</a> | <a href="https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle">isinconvexset</a> |</p><h2 id="4">Input arguments</h2><pre>      [ |  |  ]
 - V = [ Vx Vy ], real matrix double, the set, with size(V,2) = 2.
       [ |  |  ]</pre><pre>      [ |  | ]
 - P = [Px Py ], real row vector or matrix double, the coordinates of the vertex / vertices  to check. Size(P,2) = size(V,2).
@@ -79,41 +79,42 @@ V = V - G;
 theta = atan2(V(:,2),V(:,1));
 [~,i] = sort(theta);
 V = V(i,:);
-[A,B] = meshgrid(-1:0.1:1);
-P = cat(2,A(:),B(:));
+P = 2*(rand(1e3,2)-0.5);
 
 figure
 line([V(:,1); V(1,1)],[V(:,2); V(1,2)],<span class="string">'Color'</span>,[0 0 1],<span class="string">'LineWidth'</span>,2), hold <span class="string">on</span>;
 set(gcf,<span class="string">'Color'</span>,[0 0 0]), set(gca,<span class="string">'Color'</span>,[0 0 0],<span class="string">'XColor'</span>,[1 1 1],<span class="string">'YColor'</span>,[1 1 1],<span class="string">'FontSize'</span>,16);
 xlabel(<span class="string">'X'</span>), ylabel(<span class="string">'Y'</span>);
 
-isin = cell2mat(cellfun(@(c) isinside2Dset(V,c),num2cell(P,2),<span class="string">'un'</span>,0));
+isin = cell2mat(cellfun(@(c) isinpolygon(V,c),num2cell(P,2),<span class="string">'un'</span>,0));
 ColorSpec = cell2mat(cellfun(@(c) cat(2,~c,c,0),num2cell(isin,2),<span class="string">'un'</span>,0));
 
 cellfun(@(r1,r2) plot(r1(1,1),r1(1,2),<span class="string">'+'</span>,<span class="string">'Color'</span>,r2,<span class="string">'MarkerSize'</span>,4,<span class="string">'LineWidth'</span>,4),num2cell(P,2),num2cell(ColorSpec,2),<span class="string">'un'</span>,0);
 axis <span class="string">equal</span>, axis <span class="string">tight</span>;
 </pre><img vspace="5" hspace="5" src="doc_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% isinside2Dset
+%% isinpolygon
 %
-% Function to check if a vertex is located inside or outside a given
-% 2D set, boundary included (closed set).
+% Function to test if a vertex is located inside or outside
+% a given 2D set, boundary included (closed set).
 %
-% Author & support : nicolas.douillet (at) free.fr, 2023.
+% Author : nicolas.douillet9 (at) gmail.com, 2023-2025.
 %
 %% Syntax
 %
-% isin = isinside2Dset(V, P);
+% isin = isinpolygon(V, P);
 %
 %% Description
 %
-% isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
+% isin = isinpolygon(V, P) computes the boolean isin which is true/logical 1
 % in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical
 % 0 in the case vertex P belongs to the complementary set.
 %
 %% See also 
 %
-% <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset>
+% | <https://fr.mathworks.com/matlabcentral/fileexchange/182100-ispointin3dtriangle?s_tid=srchtitle ispointin3dtriangle>
+% |
+% <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset> |
 %
 %% Input arguments
 %
@@ -140,15 +141,14 @@ V = V - G;
 theta = atan2(V(:,2),V(:,1));
 [~,i] = sort(theta);
 V = V(i,:);
-[A,B] = meshgrid(-1:0.1:1);
-P = cat(2,A(:),B(:));
+P = 2*(rand(1e3,2)-0.5);
 
 figure
 line([V(:,1); V(1,1)],[V(:,2); V(1,2)],'Color',[0 0 1],'LineWidth',2), hold on;
 set(gcf,'Color',[0 0 0]), set(gca,'Color',[0 0 0],'XColor',[1 1 1],'YColor',[1 1 1],'FontSize',16);
 xlabel('X'), ylabel('Y');
 
-isin = cell2mat(cellfun(@(c) isinside2Dset(V,c),num2cell(P,2),'un',0));
+isin = cell2mat(cellfun(@(c) isinpolygon(V,c),num2cell(P,2),'un',0));
 ColorSpec = cell2mat(cellfun(@(c) cat(2,~c,c,0),num2cell(isin,2),'un',0));
 
 cellfun(@(r1,r2) plot(r1(1,1),r1(1,2),'+','Color',r2,'MarkerSize',4,'LineWidth',4),num2cell(P,2),num2cell(ColorSpec,2),'un',0);

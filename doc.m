@@ -1,23 +1,25 @@
-%% isinside2Dset
+%% isinpolygon
 %
-% Function to check if a vertex is located inside or outside a given
-% 2D set, boundary included (closed set).
+% Function to test if a vertex is located inside or outside
+% a given 2D set, boundary included (closed set).
 %
-% Author : nicolas.douillet (at) free.fr, 2023-2024.
+% Author : nicolas.douillet9 (at) gmail.com, 2023-2025.
 %
 %% Syntax
 %
-% isin = isinside2Dset(V, P);
+% isin = isinpolygon(V, P);
 %
 %% Description
 %
-% isin = isinside2Dset(V, P) computes the boolean isin which is true/logical 1
+% isin = isinpolygon(V, P) computes the boolean isin which is true/logical 1
 % in the case the vertex P belongs to the closed set V (boundary included). isin is false/logical
 % 0 in the case vertex P belongs to the complementary set.
 %
 %% See also 
 %
-% <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset>
+% | <https://fr.mathworks.com/matlabcentral/fileexchange/182100-ispointin3dtriangle?s_tid=srchtitle ispointin3dtriangle>
+% |
+% <https://fr.mathworks.com/matlabcentral/fileexchange/65688-isinconvexset-2d-3d?s_tid=srchtitle isinconvexset> |
 %
 %% Input arguments
 %
@@ -44,15 +46,14 @@ V = V - G;
 theta = atan2(V(:,2),V(:,1));
 [~,i] = sort(theta);
 V = V(i,:);
-[A,B] = meshgrid(-1:0.1:1);
-P = cat(2,A(:),B(:));
+P = 2*(rand(1e3,2)-0.5);
 
 figure
 line([V(:,1); V(1,1)],[V(:,2); V(1,2)],'Color',[0 0 1],'LineWidth',2), hold on;
 set(gcf,'Color',[0 0 0]), set(gca,'Color',[0 0 0],'XColor',[1 1 1],'YColor',[1 1 1],'FontSize',16);
 xlabel('X'), ylabel('Y');
 
-isin = cell2mat(cellfun(@(c) isinside2Dset(V,c),num2cell(P,2),'un',0));
+isin = cell2mat(cellfun(@(c) isinpolygon(V,c),num2cell(P,2),'un',0));
 ColorSpec = cell2mat(cellfun(@(c) cat(2,~c,c,0),num2cell(isin,2),'un',0));
 
 cellfun(@(r1,r2) plot(r1(1,1),r1(1,2),'+','Color',r2,'MarkerSize',4,'LineWidth',4),num2cell(P,2),num2cell(ColorSpec,2),'un',0);
